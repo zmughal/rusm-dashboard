@@ -46,6 +46,7 @@ method run() {
 }
 
 subcommand evalue => 'RUSM::Dashboard::Command::Evalue';
+subcommand ecollege => 'RUSM::Dashboard::Command::Ecollege';
 
 method _login_to_portal() {
 	$self->_mech->get($self->rusm_portal_website);
