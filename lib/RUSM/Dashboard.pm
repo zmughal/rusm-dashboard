@@ -5,15 +5,14 @@ use Carp::Assert;
 use Moo;
 use Function::Parameters;
 use MooX::Lsub;
-use HTML::FormatText::Elinks;
-use HTML::FormatText;
-use HTML::TreeBuilder;
 
 use CLI::Osprey;
 
 use Net::Netrc;
 use YAML;
 use WWW::Mechanize;
+
+use RUSM::Dashboard::Config;
 
 option config_file => (
 	is => 'ro',
@@ -24,8 +23,10 @@ option config_file => (
 	},
 );
 
-lsub config => sub {
-	YAML::LoadFile($_[0]->config_file);
+lsub config => method() {
+	RUSM::Dashboard::Config->new(
+		config_data => YAML::LoadFile($self->config_file),
+	);
 };
 
 lsub _netrc_machine => sub { Net::Netrc->lookup('rossu.edu'); };
@@ -40,7 +41,6 @@ has rusm_portal_website => (
 	is => 'ro',
 	default => 'https://myportal.rossu.edu/',
 );
-
 
 method run() {
 }
@@ -58,9 +58,5 @@ method _login_to_portal() {
 
 	should( $self->_mech->title, 'Home - myPortal' ) if DEBUG;
 }
-
-
-lsub quicklaunch_ecollege => sub { 'https://myportal.rossu.edu:443/QuickLaunch/api/launch/11'; };
-lsub quicklaunch_panopto => sub { 'https://atge.okta.com/home/adtalemglobaleducation_panoptodmrusm_1/0oafk30rb48lC1dfI0x7/alnfk3ay6o1UBEyIv0x7'; };
 
 1;
