@@ -195,7 +195,7 @@ method run_ascii() {
 		}
 	}
 
-	my $formatter_elinks = HTML::FormatText::Elinks->new();
+	my $formatter_elinks = HTML::FormatText::Elinks->new( input_charset => 'utf-8' );
 	say $formatter_elinks->format($calendar_table) =~ s/^References$ .* \Z//xmsr;
 	print $event_text;
 }
