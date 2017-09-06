@@ -239,9 +239,11 @@ method fetch_item( $contentitem, $session_id ) {
 		for my $link (@links) {
 			if( $link->URI =~ m,/pub/content/, ) {
 				push @download_links, $link;
-			} elsif( $link->URI =~ m/\.css$/i ) {
+			} elsif( $link->URI =~ m/\Q.css\E$/i ) {
 				push @ignore_links, $link;
-			} elsif( $link->URI =~ m/^javascript:/ ) {
+			} elsif( $link->URI =~ m/^\Qjavascript:\E/ ) {
+				push @ignore_links, $link;
+			} elsif( $link->URI eq '#' ) {
 				push @ignore_links, $link;
 			} else {
 				push @not_download_links, $link;
