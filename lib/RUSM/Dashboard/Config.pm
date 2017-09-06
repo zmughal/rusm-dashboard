@@ -40,13 +40,20 @@ lsub wiki_source_path => method() {
 };
 
 lsub wiki_data_path => method() {
-	my $path = $self->config_data->{wiki}{data_path};
+	my $path = path($self->config_data->{wiki}{data_path});
 	-d $path or die "wiki data path ($path) does not exist";
 	path($path);
 };
 
 lsub current_semester_source_path => method() {
 	$self->wiki_source_path->child(
+		qw(RUSM semester),
+		$self->current_semester_name,
+	);
+};
+
+lsub current_semester_data_path => method() {
+	$self->wiki_data_path->child(
 		qw(RUSM semester),
 		$self->current_semester_name,
 	);
