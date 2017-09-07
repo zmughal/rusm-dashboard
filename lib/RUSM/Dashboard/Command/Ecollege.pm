@@ -228,6 +228,25 @@ method fetch_item( $contentitem, $session_id ) {
 
 		# do some html downloading
 		my $response = $self->progress_get( $contentitem->{uri} );
+		my $modify_content = $self->_mech->content;
+		$modify_content =~ s|Welcome .* ,  There are no new items since .*$||gm;
+		$modify_content =~ s|\Q<TD align="right">\ELast Login:[^<]*\Q</TD>\E||gmi;
+		my $tree = HTML::TreeBuilder->new_from_content( $modify_content  );
+		for my $script ($tree->look_down( _tag => 'script', type => 'text/javascript' ) ) {
+			$script->delete;
+		}
+		for my $head ( $tree->look_down( _tag => 'head' ) ) {
+			for my $link ($head->look_down( _tag => 'link', rel => 'stylesheet' ) ) {
+				$link->delete;
+			}
+		}
+		for my $input ( $tree->look_down( _tag => 'input', id => qr/(activeSessionId|^encrypted|^GoldenTicket|__VIEWSTATEGENERATOR)/ )  ) {
+			$input->delete;
+		}
+		for my $form ( $tree->look_down( _tag => 'form', action => qr/(^ListThreadsView_V2)/ )  ) {
+			$form->delete;
+		}
+		$self->_mech->update_html( $tree->as_HTML );
 		$self->_mech->save_content($savepath_html);
 
 		# and download all links inside
