@@ -1,0 +1,14 @@
+semester:
+  - name: Fall2017
+    time:
+      start: 2017-08-28
+      end: 2017-12-15
+      zone: America/Dominica
+  - name: Spring2017
+    time:
+      start: 2018-01-01
+      end: 2018-04-20
+      zone: America/Dominica
+wiki:
+  source_path: ~/sw_projects/wiki/medicine/medicine
+  data_path:  ~/sw_projects/wiki/medicine/medicine.data
