@@ -45,6 +45,12 @@ lsub wiki_data_path => method() {
 	path($path);
 };
 
+lsub wiki_panopto_path => method() {
+	my $path = path($self->config_data->{wiki}{panopto_path});
+	-d $path or die "wiki panopto path ($path) does not exist";
+	path($path);
+};
+
 lsub current_semester_source_path => method() {
 	$self->wiki_source_path->child(
 		qw(RUSM semester),
@@ -54,6 +60,13 @@ lsub current_semester_source_path => method() {
 
 lsub current_semester_data_path => method() {
 	$self->wiki_data_path->child(
+		qw(RUSM semester),
+		$self->current_semester_name,
+	);
+};
+
+lsub current_semester_panopto_path => method() {
+	$self->wiki_panopto_path->child(
 		qw(RUSM semester),
 		$self->current_semester_name,
 	);

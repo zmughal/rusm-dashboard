@@ -4,6 +4,16 @@ semester:
       start: 2017-08-28
       end: 2017-12-15
       zone: America/Dominica
+    panopto:
+      folders:
+        - '09e7c11c-700d-4a9a-800e-fa29cd32e0ac' # /Semester 01
+        - '9da95cb8-f12f-4147-9c04-51211c908c3f' # /Student Orientation/New Student Orientation
+        - '4d2ff173-57ed-40e1-881d-f0755d45a349' # /Becker Review
+        - 'ec4c643c-39da-470c-93d0-41f7940ae23e' # /Brown Bag Seminars
+        - '1208d415-1067-4399-8c2f-cc42e19dad96' # /Campus Events
+        - '6871575b-5545-4451-b350-5b0625bf336b' # /CPC Sessions
+        - 'd77d99c7-805d-4162-8701-285ecbfd9d5a' # /Guest Presentations
+        - '4352f895-d007-4d9e-9135-58e31e101dac' # /Research Day
   - name: Spring2017
     time:
       start: 2018-01-01
@@ -12,3 +22,4 @@ semester:
 wiki:
   source_path: ~/sw_projects/wiki/medicine/medicine
   data_path:  ~/sw_projects/wiki/medicine/medicine.data
+  panopto_path: ~/sw_projects/wiki/medicine/medicine.data-panopto
