@@ -1,9 +1,6 @@
 package RUSM::Dashboard::Command::Ecollege;
 # ABSTRACT: Ecollege course material
 
-
-use constant RETRY_MAX => 5;
-
 use feature qw(say);
 use Moo;
 use Carp::Assert;
@@ -160,47 +157,6 @@ method download_course( $course_a_elem ) {
 			};
 		}
 	} $course_data;
-}
-
-method progress_get( $uri ) {
-	my $mech = $self->_mech;
-
-	for my $retry (0 .. RETRY_MAX-1) {
-		my $message = "Attempting to fetch [ $uri ]";
-		$message .= $retry ? " - retry $retry\n" : "\n";
-		warn $message;
-
-		$mech->show_progress(1);
-		my $response = try {
-			$mech->get($uri);
-		} catch {
-			require Carp::REPL; Carp::REPL->import('repl'); repl();#DEBUG
-		};
-		$mech->show_progress(0);
-
-		my $success = $response->is_success &&
-			$mech->content !~ qr/We are sorry but an error has occurred/;
-
-		return $response if $success;
-
-		my $status = $mech->status;
-		warn "status = $status\n";
-
-		if ($response->status_line =~ /Can't connect/) {
-			$retry++;
-			warn "cannot connect...will retry after $retry seconds\n";
-			sleep $retry;
-		} elsif ($status == 429) {
-			warn "too many requests...ignoring\n";
-			return undef;
-		} else {
-			warn "something else...\n";
-			return undef;
-		}
-	}
-
-	warn "giving up...\n";
-	return undef;
 }
 
 method fetch_item( $contentitem, $session_id ) {
