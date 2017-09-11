@@ -19,7 +19,7 @@ lsub last_day_of_lookahead => method() {
 };
 
 lsub evalue_path => method() {
-	my $evalue_path = $self->config->current_semester_source_path->child(qw(evalue));
+	my $evalue_path = $self->config->current_semester_evalue_path->child(qw(evalue));
 };
 
 lsub ical_data_for_semester => method() {

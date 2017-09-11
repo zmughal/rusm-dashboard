@@ -19,7 +19,7 @@ semester:
       start: 2018-01-01
       end: 2018-04-20
       zone: America/Dominica
-wiki:
-  source_path: ~/sw_projects/wiki/medicine/medicine
-  ecollege_path: ~/sw_projects/wiki/medicine/medicine.data-ecollege
-  panopto_path: ~/sw_projects/wiki/medicine/medicine.data-panopto
+path:
+  evalue: ~/sw_projects/wiki/medicine/medicine.data-evalue
+  ecollege: ~/sw_projects/wiki/medicine/medicine.data-ecollege
+  panopto: ~/sw_projects/wiki/medicine/medicine.data-panopto

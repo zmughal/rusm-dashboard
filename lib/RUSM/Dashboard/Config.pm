@@ -33,40 +33,40 @@ lsub current_semester => method() {
 	$active_semesters[0];
 };
 
-lsub wiki_source_path => method() {
-	my $path = path( $self->config_data->{wiki}{source_path} );
+lsub evalue_path => method() {
+	my $path = path( $self->config_data->{path}{evalue} );
 	-d $path or die "wiki source path ($path) does not exist";
 	$path;
 };
 
-lsub wiki_ecollege_path => method() {
-	my $path = path($self->config_data->{wiki}{ecollege_path});
+lsub ecollege_path => method() {
+	my $path = path($self->config_data->{path}{ecollege});
 	-d $path or die "wiki ecollege path ($path) does not exist";
 	path($path);
 };
 
-lsub wiki_panopto_path => method() {
-	my $path = path($self->config_data->{wiki}{panopto_path});
+lsub panopto_path => method() {
+	my $path = path($self->config_data->{path}{panopto});
 	-d $path or die "wiki panopto path ($path) does not exist";
 	path($path);
 };
 
-lsub current_semester_source_path => method() {
-	$self->wiki_source_path->child(
+lsub current_semester_evalue_path => method() {
+	$self->evalue_path->child(
 		qw(RUSM semester),
 		$self->current_semester_name,
 	);
 };
 
 lsub current_semester_ecollege_path => method() {
-	$self->wiki_ecollege_path->child(
+	$self->ecollege_path->child(
 		qw(RUSM semester),
 		$self->current_semester_name,
 	);
 };
 
 lsub current_semester_panopto_path => method() {
-	$self->wiki_panopto_path->child(
+	$self->panopto_path->child(
 		qw(RUSM semester),
 		$self->current_semester_name,
 	);
