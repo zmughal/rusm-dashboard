@@ -267,7 +267,10 @@ method download_folder( $folder_hash, $folder_guid ) {
 			my $response = $self->parent_command->progress_get(
 				$uri,
 				':content_file' => "$video_path" );
-			$video_path->unlink unless $response;
+			if( ! $response ) {
+				$video_path->unlink;
+				die "Could not download '$name' to $video_path";
+			}
 		}
 		$session_path->child( 'delivery.json' )
 			->spew_utf8(
