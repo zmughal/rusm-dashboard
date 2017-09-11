@@ -216,16 +216,16 @@ method fetch_item( $contentitem, $session_id ) {
 
 		# and download all links inside
 		say "Finding links";
-		my @links = $self->_mech->find_all_links();
+		my @links = ($self->_mech->links(), $self->_mech->images());
 		my @download_links;
 		my @ignore_links;
 		my @not_download_links;
 		for my $link (@links) {
-			if( $link->url_abs !~ m|^https?://| ) {
+			if( $link->URI =~ m,/pub/content/, ) {
+				push @download_links, $link;
+			} elsif( $link->url_abs !~ m|^https?://| ) {
 				# skip non-HTTP URIs such as mailto:
 				push @ignore_links, $link;
-			} elsif( $link->URI =~ m,/pub/content/, ) {
-				push @download_links, $link;
 			} elsif( $link->URI =~ m/\Q.css\E$/i ) {
 				push @ignore_links, $link;
 			} elsif( $link->URI eq '#' ) {
@@ -234,19 +234,22 @@ method fetch_item( $contentitem, $session_id ) {
 				push @not_download_links, $link;
 			}
 		}
+		my $get_text = fun($link) {
+			$link->can('text') ? ($link->text // '') : '';
+		};
 		for my $link (@download_links) {
 			my $link_filename = [ $link->URI->path_segments ]->[-1];
 			my $link_savepath = $savepath_dir->child($link_filename);
 			if( -r $link_savepath ) {
-				say "Already downloaded @{[ $link->text ]} ($link_filename) for $contentitem->{name}";
+				say "Already downloaded @{[ $link->$get_text()  ]} ($link_filename) for $contentitem->{name}";
 			} else {
 				my $link_response = $self->parent_command->progress_get( $link->URI->abs );
-				die "failed to download @{[ $link->text ]}" unless $link_response;
+				die "failed to download @{[ $link->$get_text() ]}" unless $link_response;
 				$self->_mech->save_content($link_savepath);
 			}
 		}
 		for my $link (@not_download_links) {
-			say "Not downloading @{[ $link->text // '' ]} (@{[ $link->URI ]}) for $contentitem->{name}";
+			say "Not downloading @{[ $link->$get_text() ]} (@{[ $link->URI ]}) for $contentitem->{name}";
 		}
 	}
 }
