@@ -12,7 +12,7 @@ has config => (
 );
 
 method path_for_ecollege() {
-	$self->config->current_semester_data_path->child(qw(ecollege));
+	$self->config->current_semester_ecollege_path->child(qw(ecollege));
 }
 
 method _name_to_dir( $name ) {
