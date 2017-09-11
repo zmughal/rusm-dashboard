@@ -10,7 +10,7 @@ use Try::Tiny;
 use CLI::Osprey;
 
 use Net::Netrc;
-use YAML;
+use YAML::XS qw(LoadFile);
 use WWW::Mechanize;
 
 use RUSM::Dashboard::Config;
@@ -28,7 +28,7 @@ option config_file => (
 
 lsub config => method() {
 	RUSM::Dashboard::Config->new(
-		config_data => YAML::LoadFile($self->config_file),
+		config_data => LoadFile($self->config_file),
 	);
 };
 
