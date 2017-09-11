@@ -37,7 +37,9 @@ lsub username => sub { $_[0]->_netrc_machine->login; };
 lsub password => sub { $_[0]->_netrc_machine->password; };
 
 lsub _mech => sub {
-	WWW::Mechanize->new;
+	my $mech = WWW::Mechanize->new;
+	$mech->stack_depth( 0 ); # do not use memory keeping track of history
+	$mech;
 };
 
 has rusm_portal_website => (
