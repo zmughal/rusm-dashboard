@@ -221,11 +221,12 @@ method fetch_item( $contentitem, $session_id ) {
 		my @ignore_links;
 		my @not_download_links;
 		for my $link (@links) {
-			if( $link->URI =~ m,/pub/content/, ) {
+			if( $link->url_abs !~ m|^https?://| ) {
+				# skip non-HTTP URIs such as mailto:
+				push @ignore_links, $link;
+			} elsif( $link->URI =~ m,/pub/content/, ) {
 				push @download_links, $link;
 			} elsif( $link->URI =~ m/\Q.css\E$/i ) {
-				push @ignore_links, $link;
-			} elsif( $link->URI =~ m/^\Qjavascript:\E/ ) {
 				push @ignore_links, $link;
 			} elsif( $link->URI eq '#' ) {
 				push @ignore_links, $link;
@@ -245,8 +246,7 @@ method fetch_item( $contentitem, $session_id ) {
 			}
 		}
 		for my $link (@not_download_links) {
-			my $link_filename = [ $link->URI->path_segments ]->[-1];
-			say "Not downloading @{[ $link->text ]} (@{[ $link->URI ]}) for $contentitem->{name}";
+			say "Not downloading @{[ $link->text // '' ]} (@{[ $link->URI ]}) for $contentitem->{name}";
 		}
 	}
 }
