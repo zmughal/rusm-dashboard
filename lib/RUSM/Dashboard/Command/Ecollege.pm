@@ -79,11 +79,16 @@ method _login() {
 }
 
 method download_course( $course_a_elem ) {
-	my $course_name = $course_a_elem->as_trimmed_text;
-	my $course_link = $course_a_elem->attr('href');
+	my $course_name = $course_a_elem->text;
+	my $course_link = $course_a_elem->URI->abs;
 	say "Downloading $course_name";
 
-	$self->_mech->follow_link( url => $course_link );
+	$self->_mech->get( $course_link );
+
+	if($self->_mech->content =~ qr/\QThis is not an active course.\E/) {
+		say "$course_name is not an active course";
+		return;
+	}
 
 	my $course_uri = $self->_course_loading_jsonp_uri;
 	$self->_mech->get( $course_uri );
@@ -249,21 +254,20 @@ method run() {
 
 	$self->_mech->get( 'http://rossuniversity.net/Shared/Portal/ECPWireFrame_xml.asp' );
 
-	my $course_list_tree = HTML::TreeBuilder->new_from_content($self->_mech->content);
-
-	my @mainContentLink = $course_list_tree->look_down(
-		_tag => 'a',
+	my @mainContentLink = $self->_mech->find_all_links(
+		tag => 'a' ,
 		class => 'MainContentLink' );
 
+	say "Courses:" if @mainContentLink;
 	for my $course_link (@mainContentLink) {
-		say $course_link->as_trimmed_text;
+		say "\t" . $course_link->text;
 	}
 
-	my ($fm01) = grep {
-		$_->as_trimmed_text =~ qr/FM 01 Foundations of Medicine 01/;
-	} @mainContentLink;
+	for my $course_link (@mainContentLink) {
+		say $course_link->text;
+		$self->download_course( $course_link );
+	}
 
-	$self->download_course( $fm01 );
 }
 
 method _course_loading_jsonp_uri() {
