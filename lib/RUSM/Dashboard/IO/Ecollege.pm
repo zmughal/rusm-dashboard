@@ -16,7 +16,11 @@ method path_for_ecollege() {
 }
 
 method _name_to_dir( $name ) {
-	return $name =~ s/\s/_/gr;
+	my $dir_name = $name;
+	$dir_name =~ s/\s/_/g;
+	$dir_name =~ s/:/__/g;
+	$dir_name =~ s,/,-,g;
+	return $dir_name;
 }
 
 method path_for_course( $course_data ) {
