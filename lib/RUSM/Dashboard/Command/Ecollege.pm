@@ -170,7 +170,8 @@ method fetch_item( $contentitem, $session_id ) {
 		if( -d $contentitem->{path} ) {
 			say "Already downloaded $contentitem->{name}";
 		} else {
-			my $response = $self->progress_get( $contentitem->{uri} );
+			my $response = $self->parent_command->progress_get( $contentitem->{uri} );
+			die "failed to download $contentitem->{name}" unless $response;
 			my $savepath = $contentitem->{path}->child($response->filename);
 			$savepath->parent->mkpath;
 			$self->_mech->save_content( $savepath );
@@ -183,7 +184,8 @@ method fetch_item( $contentitem, $session_id ) {
 		$savepath_html->parent->mkpath;
 
 		# do some html downloading
-		my $response = $self->progress_get( $contentitem->{uri} );
+		my $response = $self->parent_command->progress_get( $contentitem->{uri} );
+		die "failed to download $contentitem->{name}" unless $response;
 		my $modify_content = $self->_mech->content;
 		$modify_content =~ s|Welcome .* ,  There are no new items since .*$||gm;
 		$modify_content =~ s|\Q<TD align="right">\ELast Login:[^<]*\Q</TD>\E||gmi;
@@ -230,7 +232,8 @@ method fetch_item( $contentitem, $session_id ) {
 			if( -r $link_savepath ) {
 				say "Already downloaded @{[ $link->text ]} ($link_filename) for $contentitem->{name}";
 			} else {
-				my $link_response = $self->progress_get( $link->URI->abs );
+				my $link_response = $self->parent_command->progress_get( $link->URI->abs );
+				die "failed to download @{[ $link->text ]}" unless $link_response;
 				$self->_mech->save_content($link_savepath);
 			}
 		}
