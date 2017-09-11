@@ -242,7 +242,8 @@ method download_folder( $folder_hash, $folder_guid ) {
 		next if $state ne 'Complete';
 
 		my $session_path = $folder_path->child( $self->io->_name_to_dir( $name ) );
-		if( -f $folder_json ) {
+		my $session_json = $session_path->child( 'delivery.json' );
+		if( -f $session_json ) {
 			say "Session '$name' already downloaded...skipping";
 			next;
 		}
@@ -272,10 +273,9 @@ method download_folder( $folder_hash, $folder_guid ) {
 				die "Could not download '$name' to $video_path";
 			}
 		}
-		$session_path->child( 'delivery.json' )
-			->spew_utf8(
-				$json->encode($tablet_delivery_data)
-			);
+		$session_json->spew_utf8(
+			$json->encode($tablet_delivery_data)
+		);
 	}
 
 	if( ref $top_folder->{ChildFolders} eq 'HASH' ) {
