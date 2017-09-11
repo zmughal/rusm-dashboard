@@ -38,9 +38,11 @@ lsub _course_item_type_class_qr => method() {
 lsub _view_type_id_to_subdomain => sub {
 	return +{
 		managed_html => 'vizedhtmlcontent',
+		managed_od => 'msofficecontent',
 		coursehome => 'coursehome',
 		managed_upload => 'webuploadcontent',
 		managed_threads => 'threadcontent',
+		thread => 'threadcontent',
 		studentexam_v6 => 'takeexam',
 	};
 };
@@ -170,7 +172,7 @@ method fetch_item( $contentitem, $session_id ) {
 		"ActiveItem_${session_id}" => $contentitem->{ecollege_id},
 		'/', '.next.ecollege.com',
 		undef, 1, undef, undef, 1 );
-	if( $contentitem->{ecollege_id} =~ qr/\Q|managed_upload|\E/ ) {
+	if( $contentitem->{ecollege_id} =~ qr/\Q|\E(managed_upload|managed_od)\Q|\E/ ) {
 		# do some regular downloading
 		if( -d $contentitem->{path} ) {
 			say "Already downloaded $contentitem->{name}";
