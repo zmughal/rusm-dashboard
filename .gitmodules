@@ -1,4 +1,4 @@
 [submodule "vendor/p5-Panopto"]
 	path = vendor/p5-Panopto
-	url = https://github.com/zmughal/p5-Panopto.git
-	branch = zmughal
+	url = https://github.com/uw-it-cte/Panopto-perl.git
+	branch = master
