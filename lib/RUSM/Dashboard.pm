@@ -1,4 +1,5 @@
 package RUSM::Dashboard;
+# ABSTRACT: A tool for downloading course materials for Ross University School of Medicine
 
 use feature qw(say);
 use Carp::Assert;
@@ -113,3 +114,23 @@ method progress_get( $uri, @rest ) {
 }
 
 1;
+=head1 DESCRIPTION
+
+This is a tool to download course materials from an online portal to a set of
+organised folders. This is meant to be a way to continuously keep up to date
+and save time that would be used up in making sure each file is in the correct
+directory (e.g., all the material for a given week).
+
+=head1 CONFIGURATION
+
+Add your credentials to your `~/.netrc` file:
+
+  machine rossu.edu
+  login FirstNameLastName
+  password mypassword
+
+Edit the configuration file in C<example/.rusm.yml> and place in C<~/.rusm.yml>
+if you want it to be loaded by default. Otherwise, the path is taken from the
+C<--config-file> option.
+
+=cut
