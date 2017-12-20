@@ -28,7 +28,7 @@ lsub current_semester => method() {
 		$today >= $start && $today <= $end;
 	} @{ $self->config_data->{semester} };
 
-	@active_semesters == 1 or die "Multiple semesters (@{[scalar @active_semesters]})  can not be active at the same time";
+	@active_semesters == 1 or die "A single semester (@{[scalar @active_semesters]}) must be active";
 
 	$active_semesters[0];
 };
