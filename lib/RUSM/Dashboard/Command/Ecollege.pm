@@ -39,6 +39,7 @@ lsub _course_item_type_class_qr => method() {
 lsub _view_type_id_to_subdomain => sub {
 	return +{
 		managed_html => 'vizedhtmlcontent',
+		html => 'vizedhtmlcontent',
 		managed_od => 'msofficecontent',
 		coursehome => 'coursehome',
 		managed_upload => 'webuploadcontent',
