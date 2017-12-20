@@ -30,8 +30,8 @@ lsub io => method() {
 };
 
 lsub _mech => method() { $self->parent_command->_mech };
-lsub quicklaunch_panopto => sub { 'https://atge.okta.com/home/adtalemglobaleducation_panoptodmrusm_1/0oafk30rb48lC1dfI0x7/alnfk3ay6o1UBEyIv0x7'; };
-lsub panopto_server => sub { 'presentations.rossmed.edu.dm' };
+lsub quicklaunch_panopto => sub { 'https://atge.okta.com/home/adtalemglobaleducation_panoptoclinicalrusm_1/0oagva738q4UdwDSE0x7/alngvadx6fJ6II4kb0x7?fromHome=true'; };
+lsub panopto_server => sub { 'rusm.hosted.panopto.com' };
 lsub panopto_wsdl => method() { "https://@{[ $self->panopto_server ]}/Panopto/PublicAPISSL/4.2/SessionManagement.svc?wsdl" };
 lsub panopto_endpoint => method() { "https://@{[ $self->panopto_server ]}/Panopto/PublicAPISSL/4.2/SessionManagement.svc" };
 
@@ -249,7 +249,7 @@ method download_folder( $folder_hash, $folder_guid ) {
 			next;
 		}
 
-		my $tablet_delivery_uri = URI->new('https://presentations.rossmed.edu.dm/Panopto/PublicAPI/4.1/TabletDeliveryInfo');
+		my $tablet_delivery_uri = URI->new("https://@{[ $self->panopto_server ]}/Panopto/PublicAPI/4.1/TabletDeliveryInfo");
 		$tablet_delivery_uri->query_form(
 			DeliveryId => $id,
 			forDownload => 'true',
