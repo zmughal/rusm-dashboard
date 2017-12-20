@@ -1,8 +1,9 @@
 package RUSM::Dashboard::Command::Panopto;
 # ABSTRACT: Panopto subcommand
 
-use feature qw(say);
 use Moo;
+with qw(MooX::Role::Logger);
+
 use Carp::Assert;
 
 use Function::Parameters;
@@ -215,7 +216,7 @@ method download_folder( $folder_hash, $folder_guid ) {
 	my $folder_path = $top_folder->{path};
 	my $folder_json = $folder_path->child( 'folder.json' );
 
-	say "Looking at folder $folder_path";
+	$self->_logger->info("Looking at folder $folder_path");
 	my $sessions_in_folder = $self->ListSessions(
 		FolderId => $folder_guid
 	)->result;
@@ -233,18 +234,18 @@ method download_folder( $folder_hash, $folder_guid ) {
 		$sessions_in_folder->{Results}{Session} = [ $sessions_in_folder->{Results}{Session} ];
 	}
 
-	say "Number of sessions " . scalar @{ $sessions_in_folder->{Results}{Session} };
+	$self->_logger->info( "Number of sessions " . scalar @{ $sessions_in_folder->{Results}{Session} } );
 	for my $session (@{ $sessions_in_folder->{Results}{Session} }) {
 		my $id = $session->{Id};
 		my $name = $session->{Name};
 		my $state = $session->{State};
-		say "Session '$name' ($id) (state: $state)";
+		$self->_logger->info("Session '$name' ($id) (state: $state)");
 		next if $state ne 'Complete';
 
 		my $session_path = $folder_path->child( $self->io->_name_to_dir( $name ) );
 		my $session_json = $session_path->child( 'delivery.json' );
 		if( -f $session_json ) {
-			say "Session '$name' already downloaded...skipping";
+			$self->_logger->info( "Session '$name' already downloaded...skipping" );
 			next;
 		}
 
@@ -295,9 +296,9 @@ method download_folder( $folder_hash, $folder_guid ) {
 }
 
 method run() {
-	say "Logging in";
+	$self->_logger->trace( "Logging in" );
 	$self->_login;
-	say "Setting server name to @{[ $self->panopto_server ]}";
+	$self->_logger->info( "Setting server name to @{[ $self->panopto_server ]}" );
 	Panopto->SetServerName( $self->panopto_server );
 
 	my $folder_array = $self->GetAllFolders;

@@ -1,12 +1,18 @@
 package RUSM::Dashboard;
 # ABSTRACT: A tool for downloading course materials for Ross University School of Medicine
 
-use feature qw(say);
 use Carp::Assert;
 use Moo;
+
+use MooX::Role::Logger qw();
+use Log::Any::Adapter::Screen qw();
+use Log::Any::Adapter ('Screen');
+
 use Function::Parameters;
 use MooX::Lsub;
 use Try::Tiny;
+
+with qw(MooX::Role::Logger);
 
 use CLI::Osprey;
 
@@ -72,7 +78,7 @@ method progress_get( $uri, @rest ) {
 	for my $retry (0 .. RETRY_MAX-1) {
 		my $message = "Attempting to fetch [ $uri ]";
 		$message .= $retry ? " - retry $retry\n" : "\n";
-		warn $message;
+		warn $self->_logger->warn($message) if $retry;
 
 		$mech->show_progress(1);
 		my $response = try {
@@ -89,27 +95,27 @@ method progress_get( $uri, @rest ) {
 		return $response if $success;
 
 		my $status = $mech->status;
-		warn "status = $status\n";
+		warn $self->_logger->warn("status = $status");
 
 		if ($response->status_line =~ /Can't connect/) {
 			$retry++;
-			warn "cannot connect...will retry after $retry seconds\n";
+			warn $self->_logger->warn("cannot connect...will retry after $retry seconds");
 			sleep $retry;
 		} elsif ($error_has_occurred_ecollege) {
 			$retry++;
-			warn "ecollege error...will retry after $retry seconds\n";
+			warn $self->_logger->warn("ecollege error...will retry after $retry seconds");
 			sleep $retry;
 		} elsif ($status == 429) {
-			warn "too many requests...ignoring\n";
+			warn $self->_logger->warn("too many requests...ignoring");
 			return undef;
 		} else {
-			warn "something else...\n";
-			say $self->_mech->content;
+			warn $self->_logger->warn("something else...");
+			$self->_logger->trace( $self->_mech->content );
 			return undef;
 		}
 	}
 
-	warn "giving up...\n";
+	warn $self->_logger->warn("giving up...");
 	return undef;
 }
 

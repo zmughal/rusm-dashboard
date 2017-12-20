@@ -3,6 +3,7 @@ package RUSM::Dashboard::Command::Evalue;
 
 use feature qw(say);
 use Moo;
+with qw(MooX::Role::Logger);
 
 use Carp::Assert;
 use Test::Deep::NoTest;
@@ -222,7 +223,7 @@ method run_update_ical() {
 	}
 
 	for my $day_data (@data_to_download) {
-		say "Downloading events for $day_data->{date}";
+		$self->_logger->trace("Downloading events for $day_data->{date}");
 		my $cal = $self->create_ical_for_date( $day_data->{date} );
 		-d $day_data->{path}->parent || $day_data->{path}->parent->mkpath;
 		$day_data->{path}->spew_utf8( $cal->as_string );
