@@ -1,5 +1,5 @@
 #!perl
-# ABSTRACT: RUSM Dashboard
+# PODNAME: RUSM Dashboard
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";

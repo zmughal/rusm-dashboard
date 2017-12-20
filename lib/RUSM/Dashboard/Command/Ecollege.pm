@@ -1,8 +1,9 @@
 package RUSM::Dashboard::Command::Ecollege;
 # ABSTRACT: Ecollege course material
 
-use feature qw(say);
 use Moo;
+with qw(MooX::Role::Logger);
+
 use Carp::Assert;
 use Try::Tiny;
 
@@ -83,12 +84,12 @@ method _login() {
 method download_course( $course_a_elem ) {
 	my $course_name = $course_a_elem->text;
 	my $course_link = $course_a_elem->URI->abs;
-	say "Downloading $course_name";
+	$self->_logger->info( "Downloading $course_name" );
 
 	$self->_mech->get( $course_link );
 
 	if($self->_mech->content =~ qr/\QThis is not an active course.\E/) {
-		say "$course_name is not an active course";
+		$self->_logger->notice("$course_name is not an active course");
 		return;
 	}
 
@@ -167,7 +168,7 @@ method download_course( $course_a_elem ) {
 }
 
 method fetch_item( $contentitem, $session_id ) {
-	say "Fetching $contentitem->{name}";
+	$self->_logger->info("Fetching $contentitem->{name}");
 	$self->_mech->cookie_jar->set_cookie( 0,
 		"ActiveItem_${session_id}" => $contentitem->{ecollege_id},
 		'/', '.next.ecollege.com',
@@ -175,7 +176,7 @@ method fetch_item( $contentitem, $session_id ) {
 	if( $contentitem->{ecollege_id} =~ qr/\Q|\E(managed_upload|managed_od)\Q|\E/ ) {
 		# do some regular downloading
 		if( -d $contentitem->{path} ) {
-			say "Already downloaded $contentitem->{name}";
+			$self->_logger->info("Already downloaded $contentitem->{name}");
 		} else {
 			my $response = $self->parent_command->progress_get( $contentitem->{uri} );
 			die "failed to download $contentitem->{name}" unless $response;
@@ -215,7 +216,7 @@ method fetch_item( $contentitem, $session_id ) {
 		$self->_mech->save_content($savepath_html);
 
 		# and download all links inside
-		say "Finding links";
+		$self->_logger->trace( "Finding links" );
 		my @links = ($self->_mech->links(), $self->_mech->images());
 		my @download_links;
 		my @ignore_links;
@@ -241,15 +242,15 @@ method fetch_item( $contentitem, $session_id ) {
 			my $link_filename = [ $link->URI->path_segments ]->[-1];
 			my $link_savepath = $savepath_dir->child($link_filename);
 			if( -r $link_savepath ) {
-				say "Already downloaded @{[ $link->$get_text()  ]} ($link_filename) for $contentitem->{name}";
+				$self->_logger->info( "Already downloaded @{[ $link->$get_text()  ]} ($link_filename) for $contentitem->{name}" );
 			} else {
 				my $link_response = $self->parent_command->progress_get( $link->URI->abs );
-				die "failed to download @{[ $link->$get_text() ]}" unless $link_response;
+				die $self->_logger->error("failed to download @{[ $link->$get_text() ]}") unless $link_response;
 				$self->_mech->save_content($link_savepath);
 			}
 		}
 		for my $link (@not_download_links) {
-			say "Not downloading @{[ $link->$get_text() ]} (@{[ $link->URI ]}) for $contentitem->{name}";
+			$self->_logger->info("Not downloading @{[ $link->$get_text() ]} (@{[ $link->URI ]}) for $contentitem->{name}");
 		}
 	}
 }
@@ -263,13 +264,13 @@ method run() {
 		tag => 'a' ,
 		class => 'MainContentLink' );
 
-	say "Courses:" if @mainContentLink;
+	$self->_logger->info( "Courses:" ) if @mainContentLink;
 	for my $course_link (@mainContentLink) {
-		say "\t" . $course_link->text;
+		$self->_logger->info( "\t" . $course_link->text );
 	}
 
 	for my $course_link (@mainContentLink) {
-		say $course_link->text;
+		$self->_logger->info( $course_link->text );
 		$self->download_course( $course_link );
 	}
 
