@@ -154,6 +154,7 @@ method GetAllThingsRequest( $method, $result_type, @rest_args ) {
 	my $total_number_things;
 	my $page_number = 0;
 
+	my $downloading = 1;
 	do {
 		print "Downloading $result_type page ${page_number}...";
 		my $som = $self->$method( PageNumber => $page_number, @rest_args);
@@ -161,12 +162,12 @@ method GetAllThingsRequest( $method, $result_type, @rest_args ) {
 		$total_number_things = $result->{TotalNumberResults};
 		if( ref $result->{Results} eq 'HASH' and exists $result->{Results}{$result_type} ) {
 			push @things, @{ $result->{Results}{$result_type} };
-			say "got @{[ scalar @things ]} total so far";
+			$self->_logger->trace( "got @{[ scalar @things ]} total so far" );
 		} else {
-			last;
+			$downloading = 0;
 		}
 		$page_number++;
-	} while( @things < $total_number_things );
+	} while( $downloading && @things < $total_number_things );
 
 	\@things;
 
