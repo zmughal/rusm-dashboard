@@ -41,7 +41,7 @@ lsub config => method() {
 
 lsub _netrc_machine => sub { Net::Netrc->lookup('rossu.edu'); };
 lsub username => sub { $_[0]->_netrc_machine->login; };
-lsub password => sub { $_[0]->_netrc_machine->password; };
+method password() { $self->_netrc_machine->password; };
 
 lsub _mech => sub {
 	my $mech = WWW::Mechanize->new;
