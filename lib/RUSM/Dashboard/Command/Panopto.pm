@@ -156,13 +156,13 @@ method GetAllThingsRequest( $method, $result_type, @rest_args ) {
 
 	my $downloading = 1;
 	do {
-		print "Downloading $result_type page ${page_number}...";
+		$self->_logger->trace("Downloading $result_type page ${page_number}...");
 		my $som = $self->$method( PageNumber => $page_number, @rest_args);
 		my $result = $som->result;
 		$total_number_things = $result->{TotalNumberResults};
 		if( ref $result->{Results} eq 'HASH' and exists $result->{Results}{$result_type} ) {
 			push @things, @{ $result->{Results}{$result_type} };
-			$self->_logger->trace( "got @{[ scalar @things ]} total so far" );
+			$self->_logger->trace( "got @{[ scalar @things ]} total of $result_type so far" );
 		} else {
 			$downloading = 0;
 		}
