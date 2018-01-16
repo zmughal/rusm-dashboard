@@ -5,8 +5,6 @@ use Carp::Assert;
 use Moo;
 
 use MooX::Role::Logger qw();
-use Log::Any::Adapter::Screen qw();
-use Log::Any::Adapter ('Screen');
 
 use Function::Parameters;
 use MooX::Lsub;
