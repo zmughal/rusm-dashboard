@@ -77,8 +77,8 @@ method progress_get( $uri, @rest ) {
 
 	for my $retry (0 .. RETRY_MAX-1) {
 		my $message = "Attempting to fetch [ $uri ]";
-		$message .= $retry ? " - retry $retry\n" : "\n";
-		warn $self->_logger->warn($message) if $retry;
+		$message .= $retry ? " - retry $retry" : "";
+		$self->_logger->info($message);
 
 		$mech->show_progress(1);
 		my $response = try {
