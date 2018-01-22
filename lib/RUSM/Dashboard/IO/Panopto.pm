@@ -8,6 +8,7 @@ use Types::Standard qw(InstanceOf);
 
 has config => (
 	is => 'ro',
+	required => 1,
 	isa => InstanceOf['RUSM::Dashboard::Config'],
 );
 

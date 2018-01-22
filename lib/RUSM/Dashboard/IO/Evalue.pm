@@ -7,9 +7,11 @@ use Function::Parameters;
 use Types::Standard qw(InstanceOf);
 
 use Time::Seconds;
+use namespace::clean;
 
 has config => (
 	is => 'ro',
+	required => 1,
 	isa => InstanceOf['RUSM::Dashboard::Config'],
 );
 
