@@ -8,8 +8,10 @@ use Carp::Assert;
 use Try::Tiny;
 
 use Function::Parameters;
+use List::AllUtils qw(pairgrep pairvalues);
 use MooX::Lsub;
 use JSON::MaybeXS;
+use WWW::Mechanize::Link;
 
 use CLI::Osprey;
 
@@ -261,9 +263,26 @@ method run() {
 
 	$self->_mech->get( 'http://rossuniversity.net/Shared/Portal/ECPWireFrame_xml.asp' );
 
-	my @mainContentLink = $self->_mech->find_all_links(
-		tag => 'a' ,
-		class => 'MainContentLink' );
+	my $tree = HTML::TreeBuilder->new_from_content($self->_mech->content);
+	my %semesters = map { $_->as_trimmed_text => $_ } $tree->look_down( _tag => 'tr', class => 'MainContentSubHeadBg' );
+	my $start_time = $self->parent_command->config->current_semester_start_date->strftime("%B %Y");
+	my @current_semesters = pairvalues pairgrep { $a =~ /\Q$start_time\E/ } %semesters;
+
+	my @mainContentLink;
+	for my $semester (@current_semesters) {
+		my $next_sibling = ($current_semesters[0]->right())[0];
+		push @mainContentLink,
+			map {
+				WWW::Mechanize::Link->new( {
+					url  => $_->[0],
+					text => $_->[1]->as_trimmed_text,
+					tag  => $_->[3],
+					base => $self->_mech->uri,
+				});
+			}
+			grep { $_->[1]->attr('class') eq "MainContentLink" }
+			@{ $next_sibling->extract_links }
+	}
 
 	$self->_logger->info( "Courses:" ) if @mainContentLink;
 	for my $course_link (@mainContentLink) {
