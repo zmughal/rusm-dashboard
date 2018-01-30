@@ -219,7 +219,7 @@ method run_update_ical() {
 	my $last_date_to_extract = $data_to_download[-1]{date};
 	while( $current_date_to_extract->mon <= $last_date_to_extract->mon ) {
 		$self->extract_event_links( $current_date_to_extract->year, $current_date_to_extract->mon );
-		$current_date_to_extract = $current_date_to_extract->add_months(1);
+		$current_date_to_extract += Time::Piece::ONE_DAY;
 	}
 
 	for my $day_data (@data_to_download) {
