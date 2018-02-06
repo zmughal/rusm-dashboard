@@ -230,6 +230,8 @@ method fetch_item( $contentitem, $session_id ) {
 				push @ignore_links, $link;
 			} elsif( $link->URI =~ m,/pub/content/, ) {
 				push @download_links, $link;
+			} elsif( $link->URI =~ m,/CurrentCourse/, ) {
+				push @download_links, $link;
 			} elsif( $link->URI =~ m/\Q.css\E$/i ) {
 				push @ignore_links, $link;
 			} elsif( $link->URI eq '#' ) {
