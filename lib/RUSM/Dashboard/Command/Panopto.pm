@@ -265,6 +265,12 @@ method download_folder( $folder_hash, $folder_guid ) {
 			my $video_path = $session_path->child("$tag.mp4");
 			$session_path->mkpath;
 
+			if( ! $uri ) {
+				$self->_logger->warn( 'No HTTP stream available. Can not download.' );
+				$self->_logger->warn( "A StreamUrl is available at: $stream->{StreamUrl}" ) if $stream->{StreamUrl};
+				die;
+			}
+
 			die "Stream is not an .mp4: $uri" unless $uri =~ qr/\Q.mp4\E$/;
 
 			my $response = $self->parent_command->progress_get(
