@@ -274,8 +274,9 @@ method download_folder( $folder_hash, $folder_guid ) {
 				die "Stream is not an .m3u8 $uri" unless $uri =~ qr/\Q.m3u8\E$/;
 
 				my $exit = system(
-					qw(ffmpeg -protocol_whitelist), 'file,http,https,tcp,tls,crypto',
-					(-i), $stream->{StreamUrl},
+					qw(ffmpeg),
+					qw(-protocol_whitelist), 'file,http,https,tcp,tls,crypto',
+					qw(-i), $stream->{StreamUrl},
 					qw(-c copy),
 					"$video_path",
 				);
