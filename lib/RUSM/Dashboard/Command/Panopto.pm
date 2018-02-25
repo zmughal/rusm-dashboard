@@ -266,19 +266,33 @@ method download_folder( $folder_hash, $folder_guid ) {
 			$session_path->mkpath;
 
 			if( ! $uri ) {
-				$self->_logger->warn( 'No HTTP stream available. Can not download.' );
+				$self->_logger->warn( 'No HTTP stream available. Can not download using HTTP.' );
 				$self->_logger->warn( "A StreamUrl is available at: $stream->{StreamUrl}" ) if $stream->{StreamUrl};
-				die;
-			}
 
-			die "Stream is not an .mp4: $uri" unless $uri =~ qr/\Q.mp4\E$/;
+				$uri = $stream->{StreamUrl};
 
-			my $response = $self->parent_command->progress_get(
-				$uri,
-				':content_file' => "$video_path" );
-			if( ! $response ) {
-				$video_path->unlink;
-				die "Could not download '$name' to $video_path";
+				die "Stream is not an .m3u8 $uri" unless $uri =~ qr/\Q.m3u8\E$/;
+
+				my $exit = system(
+					qw(ffmpeg -protocol_whitelist), 'file,http,https,tcp,tls,crypto',
+					(-i), $stream->{StreamUrl},
+					qw(-c copy),
+					"$video_path",
+				);
+
+				if( $exit != 0 ) {
+					$video_path->unlink;
+					die "Could not download '$name' to $video_path";
+				}
+			} else {
+				die "Stream is not an .mp4: $uri" unless $uri =~ qr/\Q.mp4\E$/;
+				my $response = $self->parent_command->progress_get(
+					$uri,
+					':content_file' => "$video_path" );
+				if( ! $response ) {
+					$video_path->unlink;
+					die "Could not download '$name' to $video_path";
+				}
 			}
 		}
 		$session_json->spew_utf8(
