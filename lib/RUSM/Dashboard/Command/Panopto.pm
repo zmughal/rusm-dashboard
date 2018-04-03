@@ -31,7 +31,8 @@ lsub io => method() {
 
 lsub _mech => method() { $self->parent_command->_mech };
 lsub quicklaunch_panopto => sub { 'https://atge.okta.com/home/adtalemglobaleducation_panoptoclinicalrusm_1/0oagva738q4UdwDSE0x7/alngvadx6fJ6II4kb0x7?fromHome=true'; };
-lsub panopto_server => sub { 'rusm.hosted.panopto.com' };
+lsub panopto_server => sub { 'rusm.hosted.panopto.com' }; # Pre-clinical videos
+# Will need for clinical videos: https://rusmclinical.hosted.panopto.com/Panopto/Pages/Home.aspx
 lsub panopto_wsdl => method() { "https://@{[ $self->panopto_server ]}/Panopto/PublicAPISSL/4.2/SessionManagement.svc?wsdl" };
 lsub panopto_endpoint => method() { "https://@{[ $self->panopto_server ]}/Panopto/PublicAPISSL/4.2/SessionManagement.svc" };
 
