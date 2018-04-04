@@ -283,7 +283,7 @@ method download_folder( $folder_hash, $folder_guid ) {
 				);
 
 				if( $exit != 0 ) {
-					$video_path->unlink;
+					$video_path->remove;
 					die "Could not download '$name' to $video_path";
 				}
 			} else {
@@ -292,7 +292,7 @@ method download_folder( $folder_hash, $folder_guid ) {
 					$uri,
 					':content_file' => "$video_path" );
 				if( ! $response ) {
-					$video_path->unlink;
+					$video_path->remove;
 					die "Could not download '$name' to $video_path";
 				}
 			}
