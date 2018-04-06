@@ -92,4 +92,12 @@ lsub current_semester_name => method() {
 	$name;
 };
 
+lsub current_semester_course => method() {
+	my $course = $self->current_semester->{course};
+
+	$course =~ /^\w+$/ or die "Semseter name ($course) must not contain spaces";
+
+	$course;
+};
+
 1;

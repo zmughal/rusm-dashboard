@@ -1,5 +1,6 @@
 semester:
   - name: Fall2017
+    course: FM01
     time:
       start: 2017-08-28
       end: 2017-12-15
@@ -15,6 +16,7 @@ semester:
         - 'd77d99c7-805d-4162-8701-285ecbfd9d5a' # /Guest Presentations
         - '4352f895-d007-4d9e-9135-58e31e101dac' # /Research Day
   - name: Spring2017
+    course: FM02
     time:
       start: 2018-01-01
       end: 2018-04-20
