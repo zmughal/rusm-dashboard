@@ -9,6 +9,7 @@ use Carp::Assert;
 use Function::Parameters;
 use MooX::Lsub;
 use JSON::MaybeXS;
+use Clone qw(clone);
 
 #use SOAP::Lite +trace => [ transport => \&log_message ];
 use FindBin;
@@ -258,8 +259,9 @@ method download_folder( $folder_hash, $folder_guid ) {
 		);
 		$self->_mech->get( $tablet_delivery_uri );
 		my $tablet_delivery_data = $json->decode( $self->_mech->content );
-		my $stream_data = $tablet_delivery_data->{Delivery}{Streams};
+		my $stream_data = clone( $tablet_delivery_data->{Delivery}{Streams} );
 
+		my $failed_one = 0;
 		for my $stream (@$stream_data) {
 			my $uri = $stream->{StreamHttpUrl};
 			my $tag = $stream->{Tag};
@@ -284,7 +286,15 @@ method download_folder( $folder_hash, $folder_guid ) {
 
 				if( $exit != 0 ) {
 					$video_path->remove;
-					die "Could not download '$name' to $video_path";
+					warn "Could not download '$name' to $video_path";
+					if( ! $failed_one ) {
+						warn "Adding tablet download instead";
+						$failed_one = 1;
+						push @$stream_data, {
+							Tag => 'Tablet',
+							StreamHttpUrl => $tablet_delivery_data->{TabletDownloadUrl},
+						};
+					}
 				}
 			} else {
 				die "Stream is not an .mp4: $uri" unless $uri =~ qr/\Q.mp4\E$/;
