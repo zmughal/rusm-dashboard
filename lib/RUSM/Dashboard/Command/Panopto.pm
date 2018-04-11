@@ -288,11 +288,26 @@ method download_folder( $folder_hash, $folder_guid ) {
 					$video_path->remove;
 					warn "Could not download '$name' to $video_path";
 					if( ! $failed_one ) {
-						warn "Adding tablet download instead";
+						warn "Adding tablet or phone download instead";
 						$failed_one = 1;
+
+						my ($type, $type_key);
+
+						if( exists $tablet_delivery_data->{TabletDownloadUrl}
+							&& defined $tablet_delivery_data->{TabletDownloadUrl} ) {
+							$type = 'Tablet';
+							$type_key = 'TabletDownloadUrl';
+						} elsif( exists $tablet_delivery_data->{PhoneDownloadUrl}
+							&& defined $tablet_delivery_data->{PhoneDownloadUrl} ) {
+							$type = 'Phone';
+							$type_key = 'PhoneDownloadUrl';
+						} else {
+							die "not downloadable, neither phone nor tablet available";
+						}
+
 						push @$stream_data, {
-							Tag => 'Tablet',
-							StreamHttpUrl => $tablet_delivery_data->{TabletDownloadUrl},
+							Tag => $type,
+							StreamHttpUrl => $tablet_delivery_data->{$type_key},
 						};
 					}
 				}
