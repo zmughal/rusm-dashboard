@@ -43,6 +43,7 @@ method password() { $self->_netrc_machine->password; };
 
 lsub _mech => sub {
 	my $mech = WWW::Mechanize->new;
+	$mech->ssl_opts( verify_hostname => 0 );
 	$mech->stack_depth( 0 ); # do not use memory keeping track of history
 	$mech;
 };
