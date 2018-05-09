@@ -51,6 +51,12 @@ lsub panopto_path => method() {
 	path($path);
 };
 
+lsub canvas_path => method() {
+	my $path = path($self->config_data->{path}{canvas});
+	-d $path or die "wiki canvas path ($path) does not exist";
+	path($path);
+};
+
 lsub current_semester_evalue_path => method() {
 	$self->evalue_path->child(
 		qw(RUSM semester),
@@ -67,6 +73,13 @@ lsub current_semester_ecollege_path => method() {
 
 lsub current_semester_panopto_path => method() {
 	$self->panopto_path->child(
+		qw(RUSM semester),
+		$self->current_semester_name,
+	);
+};
+
+lsub current_semester_canvas_path => method() {
+	$self->canvas_path->child(
 		qw(RUSM semester),
 		$self->current_semester_name,
 	);
