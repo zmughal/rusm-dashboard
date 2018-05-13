@@ -10,6 +10,7 @@ use Function::Parameters;
 use MooX::Lsub;
 use JSON::MaybeXS;
 use Clone qw(clone);
+use Try::Tiny;
 
 #use SOAP::Lite +trace => [ transport => \&log_message ];
 use FindBin;
@@ -261,14 +262,39 @@ method download_folder( $folder_hash, $folder_guid ) {
 		my $tablet_delivery_data = $json->decode( $self->_mech->content );
 		my $stream_data = clone( $tablet_delivery_data->{Delivery}{Streams} );
 
+		my %tablet_delivery_streams_keys = (
+			Tablet => 'TabletDownloadUrl',
+			Phone  => 'PhoneDownloadUrl',
+		);
+		my %tablet_delivery_streams = map {
+			my $url_key = $tablet_delivery_streams_keys{$_};
+			exists $tablet_delivery_data->{$url_key}
+				&& defined $tablet_delivery_data->{$url_key}
+			?
+				(
+					$_ => {
+						Tag => $_,
+						StreamHttpUrl => $tablet_delivery_data->{$url_key},
+					}
+				)
+			:
+				();
+		} keys %tablet_delivery_streams_keys;
+
 		my $failed_one = 0;
-		for my $stream (@$stream_data) {
+		my $tablet_only = 1;
+		if( $tablet_only ) {
+			push @$stream_data, $tablet_delivery_streams{Tablet};
+		}
+		STREAM_DATA: for my $stream (@$stream_data) {
 			my $uri = $stream->{StreamHttpUrl};
 			my $tag = $stream->{Tag};
 			my $video_path = $session_path->child("$tag.mp4");
 			$session_path->mkpath;
 
 			if( ! $uri ) {
+				next STREAM_DATA if $tablet_only; # the Tablet videos are all over HTTP
+
 				$self->_logger->warn( 'No HTTP stream available. Can not download using HTTP.' );
 				$self->_logger->warn( "A StreamUrl is available at: $stream->{StreamUrl}" ) if $stream->{StreamUrl};
 
@@ -291,31 +317,24 @@ method download_folder( $folder_hash, $folder_guid ) {
 						warn "Adding tablet or phone download instead";
 						$failed_one = 1;
 
-						my ($type, $type_key);
-
-						if( exists $tablet_delivery_data->{TabletDownloadUrl}
-							&& defined $tablet_delivery_data->{TabletDownloadUrl} ) {
-							$type = 'Tablet';
-							$type_key = 'TabletDownloadUrl';
-						} elsif( exists $tablet_delivery_data->{PhoneDownloadUrl}
-							&& defined $tablet_delivery_data->{PhoneDownloadUrl} ) {
-							$type = 'Phone';
-							$type_key = 'PhoneDownloadUrl';
-						} else {
-							die "not downloadable, neither phone nor tablet available";
+						if( ! values %tablet_delivery_streams ) {
+							warn "not downloadable, neither phone nor tablet available";
+								next STREAM_DATA;
 						}
 
-						push @$stream_data, {
-							Tag => $type,
-							StreamHttpUrl => $tablet_delivery_data->{$type_key},
-						};
+						push @$stream_data, values %tablet_delivery_streams;
 					}
 				}
 			} else {
 				die "Stream is not an .mp4: $uri" unless $uri =~ qr/\Q.mp4\E$/;
-				my $response = $self->parent_command->progress_get(
-					$uri,
-					':content_file' => "$video_path" );
+				my $response = try {
+					$self->parent_command->progress_get(
+						$uri,
+						':content_file' => "$video_path" );
+				} catch {
+					#warn $_; # DEBUG : keep going to download everything at once
+					die $_;
+				};
 				if( ! $response ) {
 					$video_path->remove;
 					die "Could not download '$name' to $video_path";
