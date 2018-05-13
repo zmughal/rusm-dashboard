@@ -161,7 +161,9 @@ method download_item( $path, $item ) {
 		};
 
 	} else {
-		if( $item->{url} =~ qr/^mailto:/ ) {
+		if( ! defined $item->{url} ) {
+			return;
+		} elsif( $item->{url} =~ qr/^mailto:/ ) {
 			return;
 		} elsif( $item->{url} =~ qr|^\Qhttps://rusm.hosted.panopto.com/Panopto/Pages/Embed.aspx\E| ) {
 			$self->_logger->warn("Can not download Panopto at this time: @{[ $item->{url} ]}");
