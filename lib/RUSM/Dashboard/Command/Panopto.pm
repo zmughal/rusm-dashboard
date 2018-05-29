@@ -239,7 +239,7 @@ method download_folder( $folder_hash, $folder_guid ) {
 	}
 
 	$self->_logger->info( "Number of sessions " . scalar @{ $sessions_in_folder->{Results}{Session} } );
-	for my $session (@{ $sessions_in_folder->{Results}{Session} }) {
+	SESSION_DATA: for my $session (@{ $sessions_in_folder->{Results}{Session} }) {
 		my $id = $session->{Id};
 		my $name = $session->{Name};
 		my $state = $session->{State};
@@ -284,7 +284,12 @@ method download_folder( $folder_hash, $folder_guid ) {
 		my $failed_one = 0;
 		my $tablet_only = 1;
 		if( $tablet_only ) {
-			push @$stream_data, $tablet_delivery_streams{Tablet};
+			if( exists $tablet_delivery_streams{Tablet} ) {
+				push @$stream_data, $tablet_delivery_streams{Tablet};
+			} else {
+				warn "Tablet URL not found";
+				next SESSION_DATA;
+			}
 		}
 		STREAM_DATA: for my $stream (@$stream_data) {
 			my $uri = $stream->{StreamHttpUrl};
