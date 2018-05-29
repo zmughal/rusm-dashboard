@@ -287,7 +287,7 @@ method download_folder( $folder_hash, $folder_guid ) {
 			if( exists $tablet_delivery_streams{Tablet} ) {
 				push @$stream_data, $tablet_delivery_streams{Tablet};
 			} else {
-				warn "Tablet URL not found";
+				warn $self->_logger->warn("Tablet URL not found");
 				next SESSION_DATA;
 			}
 		}
@@ -300,8 +300,8 @@ method download_folder( $folder_hash, $folder_guid ) {
 			if( ! $uri ) {
 				next STREAM_DATA if $tablet_only; # the Tablet videos are all over HTTP
 
-				$self->_logger->warn( 'No HTTP stream available. Can not download using HTTP.' );
-				$self->_logger->warn( "A StreamUrl is available at: $stream->{StreamUrl}" ) if $stream->{StreamUrl};
+				warn $self->_logger->warn( 'No HTTP stream available. Can not download using HTTP.' );
+				warn $self->_logger->warn( "A StreamUrl is available at: $stream->{StreamUrl}" ) if $stream->{StreamUrl};
 
 				$uri = $stream->{StreamUrl};
 
@@ -317,13 +317,13 @@ method download_folder( $folder_hash, $folder_guid ) {
 
 				if( $exit != 0 ) {
 					$video_path->remove;
-					warn "Could not download '$name' to $video_path";
+					warn $self->_logger->warn( "Could not download '$name' to $video_path" );
 					if( ! $failed_one ) {
-						warn "Adding tablet or phone download instead";
+						warn $self->_logger->warn( "Adding tablet or phone download instead" );
 						$failed_one = 1;
 
 						if( ! values %tablet_delivery_streams ) {
-							warn "not downloadable, neither phone nor tablet available";
+							warn $self->_logger->warn( "not downloadable, neither phone nor tablet available" );
 								next STREAM_DATA;
 						}
 

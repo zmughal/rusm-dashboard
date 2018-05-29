@@ -148,7 +148,7 @@ method download_item( $path, $item ) {
 			my $page = $self->api( $item->{url} );
 			$self->download_page_recursively( $path, $page );
 		} catch {
-			$self->_logger->error("Could not retrive page @{[ $item->{name} ]}: $_")
+			warn $self->_logger->error("Could not retrive page @{[ $item->{name} ]}: $_")
 		};
 	} elsif( $item->{type} eq 'File' ) {
 		$self->_logger->info( "File @{[ $item->{name} || $item->{url} ]}" );
@@ -157,7 +157,7 @@ method download_item( $path, $item ) {
 			my $file = $self->api( $item->{url} );
 			$self->download_file( $path, $file );
 		} catch {
-			$self->_logger->error("Could not retrive file @{[ $item->{name} ]}: $_")
+			warn $self->_logger->error("Could not retrive file @{[ $item->{name} ]}: $_")
 		};
 
 	} else {
@@ -166,9 +166,9 @@ method download_item( $path, $item ) {
 		} elsif( $item->{url} =~ qr/^mailto:/ ) {
 			return;
 		} elsif( $item->{url} =~ qr|^\Qhttps://rusm.hosted.panopto.com/Panopto/Pages/Embed.aspx\E| ) {
-			$self->_logger->warn("Can not download Panopto at this time: @{[ $item->{url} ]}");
+			warn $self->_logger->warn("Can not download Panopto at this time: @{[ $item->{url} ]}");
 		} else {
-			$self->_logger->warn("Not downloading @{[ $item->{url} ]}");
+			warn $self->_logger->warn("Not downloading @{[ $item->{url} ]}");
 		}
 	}
 }
