@@ -324,7 +324,7 @@ method download_folder( $folder_hash, $folder_guid ) {
 
 						if( ! values %tablet_delivery_streams ) {
 							warn $self->_logger->warn( "not downloadable, neither phone nor tablet available" );
-								next STREAM_DATA;
+							next STREAM_DATA;
 						}
 
 						push @$stream_data, values %tablet_delivery_streams;
