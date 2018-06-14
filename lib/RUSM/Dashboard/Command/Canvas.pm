@@ -26,6 +26,10 @@ lsub io => method() {
 	);
 };
 
+lsub json_serialize => method() {
+	my $json = JSON::MaybeXS->new( canonical => 1 );
+};
+
 lsub _mech => method() { $self->parent_command->_mech };
 lsub quicklaunch_canvas => sub { 'https://atge.okta.com/home/devryeducationgroup_canvasrossmed_1/0oaan2l42bJbnrzuu0x7/alnan2zsvvOylKx2O0x7?fromHome=true'; };
 lsub canvas_domain => sub { 'rossmed.instructure.com' };
@@ -121,6 +125,10 @@ method download_page_recursively( $path, $page ) {
 	my $page_path = $path->child( $self->io->_name_to_dir($name) );
 	$page_path->mkpath;
 
+	my $page_json_save_path = $page_path->child(qw(.archive), "page-@{[ $page->{page_id} ]}.json");
+	$page_json_save_path->parent->mkpath;
+	$page_json_save_path->spew_utf8( $self->json_serialize->encode( $page ) );
+
 	my $links = $self->links_on_page( $page );
 	for my $link (@$links) {
 		$self->download_item( $page_path, $link );
@@ -128,6 +136,10 @@ method download_page_recursively( $path, $page ) {
 }
 
 method download_file( $path, $file ) {
+	my $file_json_save_path = $path->child(qw(.archive), "file-@{[ $file->{id} ]}.json" );
+	$file_json_save_path->parent->mkpath;
+	$file_json_save_path->spew_utf8( $self->json_serialize->encode( $file ) );
+
 	if( -f $path->child($file->{display_name}) ) {
 		$self->_logger->trace("Already downloaded @{[ $file->{display_name} ]} @{[ $file->{url} ]}");
 		return
