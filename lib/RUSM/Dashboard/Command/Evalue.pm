@@ -72,9 +72,6 @@ lsub calendar_url => sub {
 };
 
 method go_to_calendar_frame_page() {
-	# Main frame has the important parts of the application.
-	$self->_mech->follow_link( id => 'main', tag => 'frame' );
-
 	# Load a URL referenced in the JavaScript.
 	my ($main_frame_url) = $self->_mech->content =~ qr/\Qtop.main.location.href = \E"([^"]+)";/;
 	$self->_mech->get( $main_frame_url );
@@ -232,6 +229,19 @@ method run_update_ical() {
 
 method run() {
 	$self->_login;
+	if( $self->_mech->title eq 'eValue' ) {
+		$self->_mech->get('https://www.e-value.net/index.cfm?fuseaction=main_loginscreen&aiInstitutionCode=Not%20required%20unless%20provided%20by%20your%20program');
+		my $form = ($self->_mech->forms)[0];
+		my $input = $form->find_input( 'subunitid' );
+		my @value_names = $input->value_names;
+		my $subunitid_idx = map { $value_names[$_] =~ /Foundations of Medicine/ } 0..@value_names-1;
+		$input->value( ($input->possible_values)[$subunitid_idx] );
+		$self->_mech->request( $form->click );
+	} else {
+		# Main frame has the important parts of the application.
+		$self->_mech->follow_link( id => 'main', tag => 'frame' );
+	}
+
 	$self->go_to_calendar_frame_page;
 
 	if( $self->ascii ) {
